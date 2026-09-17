@@ -1,0 +1,776 @@
+openapi: 3.0.3
+info:
+  title: Channel & Group Messaging API
+  description: >
+    Endpoints for creating and managing channels and groups, their members
+    and fine-grained permissions, chat/feed messages, and the one-to-one
+    channel<->group link that auto-forwards channel posts into a group.
+  version: "1.0.0"
+
+servers:
+  - url: /api
+
+security:
+  - bearerAuth: []
+
+tags:
+  - name: Channels
+  - name: Groups
+  - name: ChannelGroupLink
+
+paths:
+  /channels:
+    post:
+      tags: [Channels]
+      summary: Create a channel (caller becomes owner)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [title]
+              properties:
+                title:
+                  type: string
+                description:
+                  type: string
+                avatar:
+                  type: string
+                visibility:
+                  $ref: '#/components/schemas/Visibility'
+      responses:
+        '201':
+          description: Channel created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  channel:
+                    $ref: '#/components/schemas/Channel'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+    get:
+      tags: [Channels]
+      summary: List channels the current user is a member of
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  channels:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Channel'
+
+  /channels/{id}:
+    parameters:
+      - $ref: '#/components/parameters/ChannelId'
+    get:
+      tags: [Channels]
+      summary: Get a channel's details
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  channel:
+                    $ref: '#/components/schemas/Channel'
+                  membership:
+                    $ref: '#/components/schemas/ChannelMember'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags: [Channels]
+      summary: Update channel info (requires edit_info permission)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                description:
+                  type: string
+                avatar:
+                  type: string
+                visibility:
+                  $ref: '#/components/schemas/Visibility'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  channel:
+                    $ref: '#/components/schemas/Channel'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags: [Channels]
+      summary: Archive the channel (owner only)
+      responses:
+        '200':
+          description: Archived
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /channels/{id}/members:
+    parameters:
+      - $ref: '#/components/parameters/ChannelId'
+    get:
+      tags: [Channels]
+      summary: List channel members
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  members:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ChannelMember'
+    post:
+      tags: [Channels]
+      summary: Add a member (or self-join if the channel is public)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userId:
+                  type: integer
+                  description: Omit to self-join a public channel
+      responses:
+        '201':
+          description: Member added
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  member:
+                    $ref: '#/components/schemas/ChannelMember'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: Already a member
+
+  /channels/{id}/members/{userId}:
+    parameters:
+      - $ref: '#/components/parameters/ChannelId'
+      - $ref: '#/components/parameters/UserId'
+    delete:
+      tags: [Channels]
+      summary: Remove a member (or leave the channel yourself)
+      responses:
+        '200':
+          description: Removed
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          description: The owner cannot leave/be removed
+
+  /channels/{id}/members/{userId}/role:
+    parameters:
+      - $ref: '#/components/parameters/ChannelId'
+      - $ref: '#/components/parameters/UserId'
+    patch:
+      tags: [Channels]
+      summary: Change a member's role and/or fine-grained permissions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                role:
+                  $ref: '#/components/schemas/MemberRole'
+                permissions:
+                  $ref: '#/components/schemas/PermissionSet'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  member:
+                    $ref: '#/components/schemas/ChannelMember'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /channels/{id}/messages:
+    parameters:
+      - $ref: '#/components/parameters/ChannelId'
+    get:
+      tags: [Channels]
+      summary: List feed posts (paginated, newest last)
+      parameters:
+        - name: before
+          in: query
+          schema:
+            type: integer
+          description: Return posts older than this message id
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            maximum: 100
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  messages:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ChannelMessage'
+    post:
+      tags: [Channels]
+      summary: Post to the channel feed (requires the `post` permission)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                body:
+                  type: string
+                type:
+                  type: string
+                  enum: [text, image, file]
+                fileId:
+                  type: integer
+      responses:
+        '201':
+          description: Posted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    $ref: '#/components/schemas/ChannelMessage'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /channels/{id}/messages/{messageId}:
+    parameters:
+      - $ref: '#/components/parameters/ChannelId'
+      - $ref: '#/components/parameters/MessageId'
+    patch:
+      tags: [Channels]
+      summary: Edit your own post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                body:
+                  type: string
+      responses:
+        '200':
+          description: OK
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    delete:
+      tags: [Channels]
+      summary: Delete a post (own post, or requires delete_messages permission)
+      responses:
+        '200':
+          description: Deleted
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /channels/{id}/messages/{messageId}/pin:
+    parameters:
+      - $ref: '#/components/parameters/ChannelId'
+      - $ref: '#/components/parameters/MessageId'
+    patch:
+      tags: [Channels]
+      summary: Pin or unpin a post (requires pin_messages permission)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                pinned:
+                  type: boolean
+      responses:
+        '200':
+          description: OK
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /channels/{id}/link:
+    parameters:
+      - $ref: '#/components/parameters/ChannelId'
+    post:
+      tags: [ChannelGroupLink]
+      summary: Link the channel to an existing group, or create a new one and link it
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                groupId:
+                  type: integer
+                  description: Link to this existing group (requires manage_link on both sides)
+                newGroup:
+                  type: object
+                  description: Create-and-link in one step; caller becomes the new group's owner
+                  properties:
+                    title:
+                      type: string
+                    description:
+                      type: string
+                    avatar:
+                      type: string
+                    visibility:
+                      $ref: '#/components/schemas/Visibility'
+      responses:
+        '201':
+          description: Linked
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LinkStatus'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: CHANNEL_ALREADY_LINKED or GROUP_ALREADY_LINKED
+    delete:
+      tags: [ChannelGroupLink]
+      summary: Unlink the channel from its group (does not delete already-forwarded messages)
+      responses:
+        '200':
+          description: Unlinked
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          description: No active link
+
+  /channels/{id}/link-status:
+    parameters:
+      - $ref: '#/components/parameters/ChannelId'
+    get:
+      tags: [ChannelGroupLink]
+      summary: Get the channel's current link status
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LinkStatus'
+
+  /groups:
+    post:
+      tags: [Groups]
+      summary: Create a group (caller becomes owner)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [title]
+              properties:
+                title:
+                  type: string
+                description:
+                  type: string
+                avatar:
+                  type: string
+                visibility:
+                  $ref: '#/components/schemas/Visibility'
+      responses:
+        '201':
+          description: Group created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  group:
+                    $ref: '#/components/schemas/Group'
+    get:
+      tags: [Groups]
+      summary: List groups the current user is a member of
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  groups:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Group'
+
+  /groups/{id}:
+    parameters:
+      - $ref: '#/components/parameters/GroupId'
+    get:
+      tags: [Groups]
+      summary: Get a group's details
+      responses:
+        '200':
+          description: OK
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags: [Groups]
+      summary: Update group info (requires edit_info permission)
+      responses:
+        '200':
+          description: OK
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    delete:
+      tags: [Groups]
+      summary: Archive the group (owner only)
+      responses:
+        '200':
+          description: Archived
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /groups/{id}/members:
+    parameters:
+      - $ref: '#/components/parameters/GroupId'
+    get:
+      tags: [Groups]
+      summary: List group members
+      responses:
+        '200':
+          description: OK
+    post:
+      tags: [Groups]
+      summary: Add a member (or self-join if the group is public)
+      responses:
+        '201':
+          description: Member added
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /groups/{id}/members/{userId}:
+    parameters:
+      - $ref: '#/components/parameters/GroupId'
+      - $ref: '#/components/parameters/UserId'
+    delete:
+      tags: [Groups]
+      summary: Remove a member (or leave yourself)
+      responses:
+        '200':
+          description: Removed
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /groups/{id}/members/{userId}/role:
+    parameters:
+      - $ref: '#/components/parameters/GroupId'
+      - $ref: '#/components/parameters/UserId'
+    patch:
+      tags: [Groups]
+      summary: Change a member's role and/or fine-grained permissions
+      responses:
+        '200':
+          description: OK
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /groups/{id}/messages:
+    parameters:
+      - $ref: '#/components/parameters/GroupId'
+    get:
+      tags: [Groups]
+      summary: List chat messages (paginated, newest last)
+      parameters:
+        - name: before
+          in: query
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            maximum: 100
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  messages:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/GroupMessage'
+    post:
+      tags: [Groups]
+      summary: Send a chat message (requires send_messages permission)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                body:
+                  type: string
+                type:
+                  type: string
+                  enum: [text, image, file]
+                fileId:
+                  type: integer
+                replyToId:
+                  type: integer
+      responses:
+        '201':
+          description: Sent
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    $ref: '#/components/schemas/GroupMessage'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /groups/{id}/messages/{messageId}:
+    parameters:
+      - $ref: '#/components/parameters/GroupId'
+      - $ref: '#/components/parameters/MessageId'
+    patch:
+      tags: [Groups]
+      summary: Edit your own message
+      responses:
+        '200':
+          description: OK
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    delete:
+      tags: [Groups]
+      summary: Delete a message (own message, or requires delete_messages permission)
+      responses:
+        '200':
+          description: Deleted
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /groups/{id}/messages/{messageId}/pin:
+    parameters:
+      - $ref: '#/components/parameters/GroupId'
+      - $ref: '#/components/parameters/MessageId'
+    patch:
+      tags: [Groups]
+      summary: Pin or unpin a message (requires pin_messages permission)
+      responses:
+        '200':
+          description: OK
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    ChannelId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+    GroupId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+    UserId:
+      name: userId
+      in: path
+      required: true
+      schema:
+        type: integer
+    MessageId:
+      name: messageId
+      in: path
+      required: true
+      schema:
+        type: integer
+
+  responses:
+    BadRequest:
+      description: Invalid request body or parameters
+    Forbidden:
+      description: >
+        Caller lacks the required permission. error is one of NOT_A_MEMBER,
+        ACTION_NOT_PERMITTED, CANNOT_MODIFY_OWNER, CANNOT_REMOVE_OWNER,
+        ADMIN_CANNOT_REMOVE_ADMIN, CANNOT_GRANT_PERMISSION_YOU_DO_NOT_HAVE.
+    NotFound:
+      description: Entity not found
+
+  schemas:
+    Visibility:
+      type: string
+      enum: [public, private]
+
+    MemberRole:
+      type: string
+      enum: [owner, admin, member]
+
+    PermissionSet:
+      type: object
+      description: Sparse map of action name -> boolean
+      properties:
+        view: { type: boolean }
+        post: { type: boolean }
+        send_messages: { type: boolean }
+        edit_info: { type: boolean }
+        delete_messages: { type: boolean }
+        pin_messages: { type: boolean }
+        manage_members: { type: boolean }
+        manage_admins: { type: boolean }
+        manage_link: { type: boolean }
+
+    Channel:
+      type: object
+      properties:
+        id: { type: integer }
+        title: { type: string }
+        description: { type: string, nullable: true }
+        avatar: { type: string, nullable: true }
+        owner_id: { type: integer }
+        visibility:
+          $ref: '#/components/schemas/Visibility'
+        is_active: { type: boolean }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+
+    Group:
+      type: object
+      properties:
+        id: { type: integer }
+        title: { type: string }
+        description: { type: string, nullable: true }
+        avatar: { type: string, nullable: true }
+        owner_id: { type: integer }
+        visibility:
+          $ref: '#/components/schemas/Visibility'
+        is_active: { type: boolean }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+
+    ChannelMember:
+      type: object
+      properties:
+        userId: { type: integer }
+        fullName: { type: string }
+        phone: { type: string }
+        role:
+          $ref: '#/components/schemas/MemberRole'
+        permissions:
+          $ref: '#/components/schemas/PermissionSet'
+        joinedAt: { type: string, format: date-time }
+        messageCount: { type: integer }
+
+    GroupMember:
+      allOf:
+        - $ref: '#/components/schemas/ChannelMember'
+
+    ChannelMessage:
+      type: object
+      properties:
+        id: { type: integer }
+        channel_id: { type: integer }
+        sender_id: { type: integer, nullable: true }
+        sender_name: { type: string }
+        body: { type: string, nullable: true }
+        type: { type: string, enum: [text, image, file] }
+        file_id: { type: integer, nullable: true }
+        is_pinned: { type: boolean }
+        is_edited: { type: boolean }
+        is_deleted: { type: boolean }
+        created_at: { type: string, format: date-time }
+
+    GroupMessage:
+      type: object
+      properties:
+        id: { type: integer }
+        group_id: { type: integer }
+        sender_id: { type: integer, nullable: true }
+        sender_name: { type: string }
+        body: { type: string, nullable: true }
+        type: { type: string, enum: [text, image, file] }
+        file_id: { type: integer, nullable: true }
+        reply_to_id: { type: integer, nullable: true }
+        forwarded_from_channel_id: { type: integer, nullable: true }
+        forwarded_from_message_id: { type: integer, nullable: true }
+        is_pinned: { type: boolean }
+        is_edited: { type: boolean }
+        is_deleted: { type: boolean }
+        created_at: { type: string, format: date-time }
+
+    LinkStatus:
+      type: object
+      properties:
+        linked: { type: boolean }
+        link:
+          type: object
+          nullable: true
+          properties:
+            id: { type: integer }
+            linkedAt: { type: string, format: date-time }
+            linkedBy: { type: integer, nullable: true }
+        group:
+          type: object
+          nullable: true
+          properties:
+            id: { type: integer }
+            title: { type: string }
+            avatar: { type: string, nullable: true }

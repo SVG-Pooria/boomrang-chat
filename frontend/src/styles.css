@@ -1,0 +1,669 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * Design system definition.
+ *
+ * The @theme inline block maps CSS custom properties to Tailwind utility
+ * classes (e.g. --color-primary -> bg-primary, text-primary).
+ *
+ * The :root and .dark blocks define the actual color values using oklch.
+ * All colors MUST use oklch format.
+ *
+ * To add a new semantic color:
+ * 1. Add the variable to :root (light value) and .dark (dark value)
+ * 2. Register it in @theme inline as --color-<name>: var(--<name>)
+ */
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-ring-offset-background: var(--background);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-chat-ink: var(--chat-ink);
+  --color-chat-ink-soft: var(--chat-ink-soft);
+  --color-chat-mint: var(--chat-mint);
+  --color-chat-mint-deep: var(--chat-mint-deep);
+  --color-chat-sky: var(--chat-sky);
+  --color-chat-sky-deep: var(--chat-sky-deep);
+  --color-chat-rose: var(--chat-rose);
+  --color-chat-lemon: var(--chat-lemon);
+  --color-chat-violet: var(--chat-violet);
+  --color-chat-panel: var(--chat-panel);
+  --color-chat-panel-border: var(--chat-panel-border);
+  --color-chat-surface: var(--chat-surface);
+  --color-chat-on-accent: var(--chat-on-accent);
+  --color-chat-on-ink: var(--chat-on-ink);
+  --color-chat-scrim: var(--chat-scrim);
+  --font-display: "Vazirmatn", system-ui, sans-serif;
+  --font-body: "Vazirmatn", system-ui, sans-serif;
+}
+
+:root {
+  --radius: 0.625rem;
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.129 0.042 264.695);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.129 0.042 264.695);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.129 0.042 264.695);
+  --primary: oklch(0.208 0.042 265.755);
+  --primary-foreground: oklch(0.984 0.003 247.858);
+  --secondary: oklch(0.968 0.007 247.896);
+  --secondary-foreground: oklch(0.208 0.042 265.755);
+  --muted: oklch(0.968 0.007 247.896);
+  --muted-foreground: oklch(0.554 0.046 257.417);
+  --accent: oklch(0.968 0.007 247.896);
+  --accent-foreground: oklch(0.208 0.042 265.755);
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(0.984 0.003 247.858);
+  --border: oklch(0.929 0.013 255.508);
+  --input: oklch(0.929 0.013 255.508);
+  --ring: oklch(0.704 0.04 256.788);
+  --chart-1: oklch(0.646 0.222 41.116);
+  --chart-2: oklch(0.6 0.118 184.704);
+  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.769 0.188 70.08);
+  --sidebar: oklch(0.984 0.003 247.858);
+  --sidebar-foreground: oklch(0.129 0.042 264.695);
+  --sidebar-primary: oklch(0.208 0.042 265.755);
+  --sidebar-primary-foreground: oklch(0.984 0.003 247.858);
+  --sidebar-accent: oklch(0.968 0.007 247.896);
+  --sidebar-accent-foreground: oklch(0.208 0.042 265.755);
+  --sidebar-border: oklch(0.929 0.013 255.508);
+  --sidebar-ring: oklch(0.704 0.04 256.788);
+  --chat-ink: oklch(0.4 0.075 288);
+  --chat-ink-soft: oklch(0.62 0.055 288);
+  --chat-mint: oklch(0.71 0.12 170);
+  --chat-mint-deep: oklch(0.58 0.115 170);
+  --chat-sky: oklch(0.68 0.14 255);
+  --chat-sky-deep: oklch(0.57 0.18 255);
+  --chat-rose: oklch(0.72 0.15 0);
+  --chat-lemon: oklch(0.82 0.15 90);
+  --chat-violet: oklch(0.65 0.19 300);
+  --chat-panel: oklch(1 0 0 / 0.55);
+  --chat-panel-border: oklch(1 0 0 / 0.7);
+  --chat-surface: oklch(0.95 0.02 270);
+  --chat-on-accent: oklch(1 0 0);
+  --chat-on-ink: oklch(1 0 0);
+  --chat-scrim: oklch(0.3 0.06 288 / 0.42);
+  --chat-glow-mint: oklch(0.85 0.08 170 / 0.35);
+  --chat-glow-sky: oklch(0.85 0.08 255 / 0.35);
+  --chat-glow-rose: oklch(0.9 0.06 340 / 0.3);
+  --chat-scrollbar: oklch(0.4 0.075 288 / 0.18);
+  --chat-scrollbar-hover: oklch(0.4 0.075 288 / 0.32);
+}
+
+.dark {
+  --background: oklch(0.129 0.042 264.695);
+  --foreground: oklch(0.984 0.003 247.858);
+  --card: oklch(0.208 0.042 265.755);
+  --card-foreground: oklch(0.984 0.003 247.858);
+  --popover: oklch(0.208 0.042 265.755);
+  --popover-foreground: oklch(0.984 0.003 247.858);
+  --primary: oklch(0.929 0.013 255.508);
+  --primary-foreground: oklch(0.208 0.042 265.755);
+  --secondary: oklch(0.279 0.041 260.031);
+  --secondary-foreground: oklch(0.984 0.003 247.858);
+  --muted: oklch(0.279 0.041 260.031);
+  --muted-foreground: oklch(0.704 0.04 256.788);
+  --accent: oklch(0.279 0.041 260.031);
+  --accent-foreground: oklch(0.984 0.003 247.858);
+  --destructive: oklch(0.704 0.191 22.216);
+  --destructive-foreground: oklch(0.984 0.003 247.858);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.551 0.027 264.364);
+  --chart-1: oklch(0.488 0.243 264.376);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.627 0.265 303.9);
+  --chart-5: oklch(0.645 0.246 16.439);
+  --sidebar: oklch(0.208 0.042 265.755);
+  --sidebar-foreground: oklch(0.984 0.003 247.858);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.984 0.003 247.858);
+  --sidebar-accent: oklch(0.279 0.041 260.031);
+  --sidebar-accent-foreground: oklch(0.984 0.003 247.858);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.551 0.027 264.364);
+  --color-white: oklch(0.285 0.032 283);
+  --chat-ink: oklch(0.94 0.016 285);
+  --chat-ink-soft: oklch(0.74 0.03 285);
+  --chat-mint: oklch(0.72 0.115 170);
+  --chat-mint-deep: oklch(0.82 0.1 170);
+  --chat-sky: oklch(0.7 0.125 255);
+  --chat-sky-deep: oklch(0.8 0.1 255);
+  --chat-rose: oklch(0.74 0.135 5);
+  --chat-lemon: oklch(0.85 0.12 90);
+  --chat-violet: oklch(0.76 0.13 300);
+  --chat-panel: oklch(0.225 0.03 282 / 0.72);
+  --chat-panel-border: oklch(1 0 0 / 0.075);
+  --chat-surface: oklch(0.165 0.026 280);
+  --chat-on-accent: oklch(0.99 0.004 285);
+  --chat-on-ink: oklch(0.2 0.03 282);
+  --chat-scrim: oklch(0.08 0.02 280 / 0.62);
+  --chat-glow-mint: oklch(0.42 0.08 170 / 0.22);
+  --chat-glow-sky: oklch(0.42 0.1 255 / 0.26);
+  --chat-glow-rose: oklch(0.42 0.09 335 / 0.18);
+  --chat-scrollbar: oklch(1 0 0 / 0.12);
+  --chat-scrollbar-hover: oklch(1 0 0 / 0.22);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+    scrollbar-width: thin;
+    scrollbar-color: var(--chat-scrollbar) transparent;
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-body);
+  }
+
+  .app-canvas {
+    background-color: var(--chat-surface);
+    background-image:
+      radial-gradient(1100px 640px at -8% -12%, var(--chat-glow-mint), transparent 60%),
+      radial-gradient(920px 600px at 112% -6%, var(--chat-glow-sky), transparent 55%),
+      radial-gradient(820px 640px at 50% 118%, var(--chat-glow-rose), transparent 60%);
+  }
+
+  .panel {
+    background-color: var(--chat-panel);
+    border: 1px solid var(--chat-panel-border);
+    backdrop-filter: blur(24px);
+  }
+
+  .custom-scrollbar {
+    overscroll-behavior: contain;
+  }
+
+  @supports selector(::-webkit-scrollbar) {
+    * {
+      scrollbar-width: auto;
+      scrollbar-color: auto;
+    }
+
+    ::-webkit-scrollbar {
+      width: 9px;
+      height: 9px;
+    }
+
+    ::-webkit-scrollbar-track,
+    ::-webkit-scrollbar-corner {
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      border: 2.5px solid transparent;
+      border-radius: 999px;
+      background-color: var(--chat-scrollbar);
+      background-clip: padding-box;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background-color: var(--chat-scrollbar-hover);
+    }
+
+    ::-webkit-scrollbar-button {
+      display: none;
+      width: 0;
+      height: 0;
+    }
+  }
+}
+
+/* ============= صفحه ورود ============= */
+
+.login-page {
+  --radius: 1.125rem;
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+  --primary: oklch(0.4 0.075 288);
+  --primary-foreground: oklch(1 0 0);
+  --border: oklch(1 0 0 / 0.72);
+  --input: oklch(0.4 0.075 288 / 0.1);
+  --ring: oklch(0.65 0.19 300 / 0.42);
+  --chat-panel: oklch(1 0 0 / 0.62);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chat-panel: var(--chat-panel);
+  font-family: "Vazirmatn", Tahoma, sans-serif;
+  letter-spacing: 0;
+}
+
+.login-page {
+  min-height: 100svh;
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  overflow: hidden;
+  background-color: var(--chat-surface);
+  color: var(--chat-ink);
+}
+
+.login-page::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  opacity: 0.54;
+  background-image: radial-gradient(var(--chat-ink-soft) 0.65px, transparent 0.65px);
+  background-size: 22px 22px;
+}
+
+.login-page::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(115deg, transparent 15%, var(--chat-panel) 52%, transparent 84%);
+}
+
+.login-header {
+  display: flex;
+  justify-content: center;
+  padding: 24px 24px 8px;
+}
+
+.login-brand {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+.login-brand > div:last-child {
+  display: grid;
+  gap: 1px;
+}
+
+.login-brand strong {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.login-brand span {
+  color: var(--chat-ink-soft);
+  font-size: 10px;
+}
+
+.brand-mark-image {
+  border-radius: 18px;
+  box-shadow: 0 8px 20px oklch(0.57 0.18 255 / 0.22);
+}
+
+.login-shell {
+  width: min(100%, 476px);
+  align-self: center;
+  justify-self: center;
+  padding: 20px 24px 40px;
+}
+
+.login-card {
+  position: relative;
+  padding: 36px 40px 28px;
+  border: 1px solid var(--chat-panel);
+  border-radius: 22px;
+  background-color: var(--chat-panel);
+  box-shadow: 0 22px 65px oklch(0.4 0.075 288 / 0.11);
+  backdrop-filter: blur(20px);
+}
+
+.login-card-topline {
+  position: absolute;
+  top: 16px;
+  right: 18px;
+  display: flex;
+  gap: 5px;
+}
+
+.login-card-topline span {
+  width: 5px;
+  height: 5px;
+  border-radius: 999px;
+  background-color: var(--chat-mint);
+}
+
+.login-card-topline span:nth-child(2) {
+  background-color: var(--chat-sky);
+}
+
+.login-card-topline span:nth-child(3) {
+  background-color: var(--chat-rose);
+}
+
+.login-emblem {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 18px;
+}
+
+.login-emblem .brand-mark-image {
+  width: 52px;
+  height: 52px;
+}
+
+.login-copy {
+  text-align: center;
+}
+
+.login-kicker {
+  display: inline-flex;
+  margin: 0 0 7px;
+  padding: 5px 11px;
+  border-radius: 999px;
+  background-color: oklch(0.71 0.12 170 / 0.16);
+  color: var(--chat-mint-deep);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.login-copy h1 {
+  margin: 0;
+  color: var(--chat-ink);
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+.login-copy > p:last-child {
+  margin: 8px auto 0;
+  color: var(--chat-ink-soft);
+  font-size: 12px;
+  line-height: 1.9;
+}
+
+.login-form {
+  display: grid;
+  gap: 18px;
+  margin-top: 28px;
+}
+
+.form-field {
+  display: grid;
+  gap: 8px;
+}
+
+.form-field label,
+.field-label-row a {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.field-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.field-label-row a {
+  color: var(--chat-sky);
+  font-size: 10px;
+  text-decoration: none;
+}
+
+.input-wrap {
+  position: relative;
+}
+
+.input-wrap > svg:first-child {
+  width: 17px;
+  height: 17px;
+  position: absolute;
+  top: 50%;
+  right: 15px;
+  z-index: 1;
+  transform: translateY(-50%);
+  color: var(--chat-ink-soft);
+}
+
+.input-wrap input {
+  height: 50px;
+  border: 1px solid var(--input);
+  border-radius: 14px;
+  background-color: oklch(1 0 0 / 0.68);
+  box-shadow: none;
+  color: var(--chat-ink);
+  padding-inline: 44px;
+  font-size: 13px;
+}
+
+.input-wrap input::placeholder {
+  color: oklch(0.62 0.055 288 / 0.64);
+}
+
+.input-wrap input:focus-visible {
+  border-color: oklch(0.65 0.19 300 / 0.42);
+  box-shadow: 0 0 0 4px oklch(0.65 0.19 300 / 0.09);
+}
+
+.password-toggle {
+  width: 36px;
+  height: 36px;
+  position: absolute;
+  top: 7px;
+  left: 7px;
+  color: var(--chat-ink-soft);
+}
+
+.password-toggle:hover {
+  background-color: oklch(0.65 0.19 300 / 0.08);
+  color: var(--chat-violet);
+}
+
+.field-error {
+  margin: 0;
+  color: var(--destructive);
+  font-size: 10px;
+  line-height: 1.6;
+}
+
+.login-submit {
+  height: 50px;
+  margin-top: 2px;
+  border-radius: 14px;
+  background: linear-gradient(100deg, var(--chat-ink), oklch(0.48 0.1 288));
+  color: var(--primary-foreground);
+  font-size: 13px;
+  font-weight: 700;
+  box-shadow: 0 12px 26px oklch(0.4 0.075 288 / 0.2);
+}
+
+.login-submit:hover {
+  background: linear-gradient(100deg, oklch(0.36 0.075 288), oklch(0.44 0.1 288));
+}
+
+.login-security {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 22px;
+  color: var(--chat-mint-deep);
+  font-size: 10px;
+}
+
+.login-security svg {
+  width: 15px;
+  height: 15px;
+}
+
+.login-help {
+  max-width: 350px;
+  margin: 20px auto 0;
+  color: var(--chat-ink-soft);
+  font-size: 10px;
+  line-height: 1.9;
+  text-align: center;
+}
+
+.login-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  padding: 0 24px 22px;
+  color: var(--chat-ink-soft);
+  font-size: 9px;
+}
+
+.login-footer i {
+  width: 3px;
+  height: 3px;
+  border-radius: 999px;
+  background-color: var(--chat-violet);
+}
+
+.login-decor {
+  position: absolute;
+  z-index: -1;
+  opacity: 0.2;
+  filter: blur(1px);
+}
+
+.login-decor-mint {
+  width: 120px;
+  height: 120px;
+  top: 18%;
+  right: -54px;
+  border: 2px solid var(--chat-mint);
+  border-radius: 46% 54% 42% 58%;
+  transform: rotate(18deg);
+}
+
+.login-decor-violet {
+  width: 150px;
+  height: 84px;
+  bottom: 16%;
+  left: -78px;
+  border: 2px solid var(--chat-violet);
+  border-radius: 48% 52% 55% 45%;
+  transform: rotate(-12deg);
+}
+
+.dark .login-page {
+  --primary: oklch(0.9 0.03 288);
+  --primary-foreground: oklch(0.2 0.03 282);
+  --border: oklch(1 0 0 / 0.08);
+  --input: oklch(1 0 0 / 0.1);
+  --chat-panel: oklch(0.225 0.03 282 / 0.78);
+}
+
+.dark .login-card {
+  box-shadow: 0 22px 65px oklch(0 0 0 / 0.45);
+}
+
+.dark .input-wrap input {
+  background-color: oklch(0.2 0.028 282 / 0.9);
+}
+
+.dark .input-wrap input::placeholder {
+  color: oklch(0.74 0.03 285 / 0.6);
+}
+
+.dark .login-submit {
+  background: linear-gradient(100deg, oklch(0.62 0.12 170), oklch(0.58 0.14 255));
+  color: oklch(0.99 0.004 285);
+  box-shadow: 0 12px 26px oklch(0 0 0 / 0.35);
+}
+
+.dark .login-submit:hover {
+  background: linear-gradient(100deg, oklch(0.66 0.12 170), oklch(0.62 0.14 255));
+}
+
+@media (max-width: 520px) {
+  .login-header {
+    padding-top: 18px;
+  }
+  .login-shell {
+    padding: 14px 16px 28px;
+  }
+  .login-card {
+    padding: 32px 22px 24px;
+    border-radius: 18px;
+  }
+}
+
+@media (max-height: 700px) and (min-width: 521px) {
+  .login-shell {
+    padding-top: 8px;
+    padding-bottom: 16px;
+  }
+  .login-card {
+    padding-top: 28px;
+  }
+  .login-form {
+    margin-top: 20px;
+    gap: 14px;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .login-card {
+    animation: login-card-in 440ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  @keyframes login-card-in {
+    from {
+      opacity: 0;
+      transform: translateY(12px) scale(0.985);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+}

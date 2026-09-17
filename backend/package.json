@@ -1,0 +1,43 @@
+{
+  "name": "boomrang-chat-backend",
+  "version": "0.8.0",
+  "private": true,
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "ensure-db": "node src/db/ensure-database.js",
+    "check-port": "node scripts/check-port.js",
+    "set-port": "node scripts/set-port.js",
+    "set-backup-mirror-dir": "node scripts/set-backup-mirror-dir.js",
+    "migrate": "node src/db/migrate.js",
+    "seed": "node src/db/seed.js",
+    "seed:dev": "node src/db/seed-dev.js",
+    "seed:qa": "node src/db/seed-qa.js",
+    "seed:workspace": "node src/db/seed-workspace.js",
+    "set-admin-passwords": "node src/db/set-super-admin-passwords.js",
+    "test": "node --test tests/unit/*.test.js",
+    "test:unit": "node --test tests/unit/*.test.js",
+    "test:integration": "node --test tests/integration/*.test.js",
+    "test:load": "node tests/load/loadTest.js"
+  },
+  "dependencies": {
+    "@socket.io/redis-adapter": "^8.3.0",
+    "archiver": "^7.0.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "ffmpeg-static": "^5.2.0",
+    "fluent-ffmpeg": "^2.1.3",
+    "helmet": "^7.1.0",
+    "ioredis": "^5.4.1",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^1.4.5-lts.1",
+    "node-cron": "^3.0.3",
+    "pg": "^8.12.0",
+    "sharp": "^0.33.4",
+    "socket.io": "^4.7.5"
+  },
+  "devDependencies": {
+    "socket.io-client": "^4.7.5"
+  }
+}
