@@ -57,6 +57,6 @@ frontend-source/  باندل‌های اولیهٔ رابط کاربری (مرج
 
 ```bash
 cd backend
-npm test                  # تست‌های واحد
-npm run test:integration  # نیازمند سرور در حال اجرا
+npm test     
+npm run test:integration  
 ```
